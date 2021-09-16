@@ -1,10 +1,10 @@
-# Use the Container Image for PAS for OpenEdge 12.2.1 with a Sample Application
+# Use the Container Image for PAS for OpenEdge 12.3.0 with a Sample Application
 
 ## Requirements:
 * Docker environment
 * Docker Compose
 * A valid progress.cfg file
-* OpenEdge 12.2.1 Environment
+* OpenEdge 12.3.0 Environment
 * Scripts to deploy Progress Application Server for OpenEdge Container. This can be obtained either from the Progress Download Center or Progress communities.
 
 Note: For the deployment, we are using service port 8811(sample-app), 9200(elasticsearch), 5601(kibana) and 8080(web-ui). These ports should be available.
