@@ -1,0 +1,3 @@
+#!/bin/sh
+
+docker run -d -p 20000:20000 -p 3000-4000:3000-4000 -e DB_BROKER_PORT=20000 -e DB_MINPORT=3000 -e DB_MAXPORT=4000 oedb1
