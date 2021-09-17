@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: ${PAS.INSTANCE.NAME}-service
+  labels:
+    app: ${PAS.INSTANCE.NAME}
+    version: v1
+spec:
+  type: NodePort
+  ports:
+    - targetPort: https
+      nodePort: ${PASOE.HTTPS.PORT}
+      port: 8811
+      protocol: TCP
+  selector:
+    app: ${PAS.INSTANCE.NAME}
+    version: v1

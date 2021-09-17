@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="pasoe_container" default="pasoe_run" basedir=".">
+
+	<taskdef resource="net/sf/antcontrib/antlib.xml" classpath="../../lib/ant-contrib-0.6.jar" />
+	
+	<property file="../../config.properties" />
+
+	<propertyregex property="APP.NAME"
+              input="${APP.DOCKER.IMAGE.NAME}"
+              regexp="([^\/]*$)"
+              select="\1"/>
+
+	<property name="APP.DOCKER.IMAGE.FULLNAME" value="${APP.DOCKER.IMAGE.NAME}:${APP.DOCKER.IMAGE.TAG}" />
+	
+	<property name="PASOE.DOCKER.IMAGE.FULLNAME" value="${PASOE.DOCKER.IMAGE.NAME}:${PASOE.DOCKER.IMAGE.TAG}" />
+
+	<property name="JDK.DOCKER.IMAGE.FULLNAME" value="${JDK.DOCKER.IMAGE.NAME}:${JDK.DOCKER.IMAGE.TAG}" />
+	
+	<property name="LICENSE.CONFIG.MAP" value="${JDK.DOCKER.IMAGE.NAME}:${JDK.DOCKER.IMAGE.TAG}" />
+	
+	<property name="RUNTIME.CONFIG" location="${basedir}/../../conf" />
+	<property name="LICENSE.FILE" value="../../license/progress.cfg" />
+	<property name="LOGGING.CONF.DIR" location="${basedir}/../../conf/logging" />
+
+	
+	<target name="create_config_maps" description="creates config maps for runtime.properties and logging configuration">
+		<exec executable="kubectl" >
+			<arg line="create configmap runtime-config-${PAS.INSTANCE.NAME} --from-file=${RUNTIME.CONFIG}"/>
+		</exec>
+		<exec executable="kubectl" >
+			<arg line="create configmap logging-config-${PAS.INSTANCE.NAME} --from-file=${LOGGING.CONF.DIR}"/>
+		</exec>
+	</target>
+	
+	<target name="create_license_secret" description="creates secret for license">
+		<exec executable="kubectl" >
+			<arg line="create secret generic progress-122-license --from-file=${LICENSE.FILE}"/>
+		</exec>
+	</target>
+	
+	<target name="validate_prerequisites" >
+		<exec executable="kubectl" failonerror="true" >
+			<arg line="get configmap runtime-config-${PAS.INSTANCE.NAME} "/>
+		</exec>
+		<exec executable="kubectl" failonerror="true" >
+			<arg line="get configmap logging-config-${PAS.INSTANCE.NAME} "/>
+		</exec>
+		<exec executable="kubectl" failonerror="true" >
+			<arg line="get secret progress-122-license "/>
+		</exec>
+	</target>
+	
+	<target name="generate_tailored_yml">
+		<!-- Copy task that replaces values and copies the files -->
+		<copy todir="${basedir}" verbose="true" overwrite="true" failonerror="true">
+			
+			<!-- List of files to be processed -->
+			<fileset file="${basedir}/*.template.yml" />
+			
+			<!-- Mapper to transform filename. Removes '.template' from the filename when copying the file to output directory -->
+			<mapper type="regexp" from="(.*).template(.*)" to="\1\2" />
+			
+			<!-- Filter chain that replaces the template values with actual values 
+				fetched from properties file -->
+			<filterchain>
+				<expandproperties />
+			</filterchain>
+		</copy>
+	</target>
+	
+	<target name="delete_config_maps" description="creates config maps for runtime.properties and logging configuration">
+		<exec executable="kubectl" >
+			<arg line="delete configmap runtime-config-${PAS.INSTANCE.NAME} "/>
+		</exec>
+		<exec executable="kubectl" >
+			<arg line="delete configmap logging-config-${PAS.INSTANCE.NAME} "/>
+		</exec>
+	</target>
+	
+	<target name="delete_license_secret" description="creates secret for license">
+		<exec executable="kubectl" >
+			<arg line="delete secret progress-122-license "/>
+		</exec>
+	</target>
+	
+	<target name="deploy" depends="undeploy,generate_tailored_yml,create_config_maps,create_license_secret,validate_prerequisites" >
+		<exec executable="kubectl" failonerror="true">
+			<arg line="create -f service.yml"/>
+		</exec>
+		<exec executable="kubectl" failonerror="true">
+			<arg line="create -f deployment.yml"/>
+		</exec>
+		<echo message="PASOE instance named '${PAS.INSTANCE.NAME}' will be available at 'https://**minikube-ip**:${PASOE.HTTPS.PORT}'"/>
+		<echo message="You can also do 'minikube service --https ${PAS.INSTANCE.NAME}-service' to directly open it on default browser"/>
+	</target>
+	
+	<target name="undeploy" depends="generate_tailored_yml, delete_config_maps,delete_license_secret">
+		<exec executable="kubectl">
+			<arg line="delete -f service.yml"/>
+		</exec>
+		<exec executable="kubectl" >
+			<arg line="delete -f deployment.yml"/>
+		</exec>
+	</target>
+
+</project>

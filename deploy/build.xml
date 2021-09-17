@@ -1,0 +1,182 @@
+<project name="deployAppToPASOE" default="deploy" basedir=".">
+
+    <property environment="env" />
+	<property file="config.properties" />
+
+	<pathconvert property="ROOT" dirsep="/">
+		<path location="${basedir}" />
+	</pathconvert>
+
+	<taskdef resource="net/sf/antcontrib/antlib.xml" classpath="${ROOT}/lib/ant-contrib-0.6.jar" />
+	<import file="${ROOT}/tasks/common-build-tasks.xml" />
+
+	<property name="INSTANCE.NAME" value="${PAS.INSTANCE.NAME}" />
+	<property name="INSTANCE.ARCHIVE.FILE.NAME" value="${INSTANCE.NAME}.zip" />
+
+	<property name="PASOE.IMAGE.ARCHIVE.FILE" value="${ROOT}/../PROGRESS_PASOE_CONTAINER_IMAGE_12.2.0_LNX_64.tar.gz" />
+	
+	<property name="APP.DOCKER.IMAGE.TAG" value="latest" />
+	<property name="JDK.DOCKER.IMAGE.TAG" value="latest" />
+	<property name="PASOE.DOCKER.IMAGE.TAG" value="latest" />
+	<property name="DOCKERFILE.LOCATION" value="${ROOT}" />
+
+	<property name="OUTPUT.DIR" value="${ROOT}/output" />
+	<property name="DIST.DIR" value="${OUTPUT.DIR}/package-output" />
+	<property name="BUILD.OUTPUT.DIR" value="${OUTPUT.DIR}/build-output" />
+
+	<property name="FLUENTBIT.LOGGING" value="true" />
+
+	<condition property="PASOE.IMAGE.ARCHIVE.FILE.exists">
+       <available file="${PASOE.IMAGE.ARCHIVE.FILE}"/> 
+    </condition>
+
+	<target name="clean" description="Clean build output dir">
+		<delete dir="${BUILD.OUTPUT.DIR}" />
+		<mkdir dir="${BUILD.OUTPUT.DIR}" />
+	</target>
+
+	<target name="cleanDist" description="clean dest dir">
+		<delete dir="${DIST.DIR}" />
+		<mkdir dir="${DIST.DIR}" />
+	</target>
+
+	<target name="createInstanceZip" depends="cleanDist">
+		<!-- Create instance zip with ablapps, tlr and conf -->
+		<zip destfile="${DIST.DIR}/${INSTANCE.ARCHIVE.FILE.NAME}">
+			  <zipfileset dir="./ablapps" prefix="ablapps"/>
+		</zip>
+	</target>
+
+	<!-- Checks if the configurations in runtime.properties are correct	-->
+	<target name="checkRuntimeProperties">
+		<!-- Get all the runtime properties with a prefix so that it can be filtered afterwards -->
+		<property file="${RUNTIME.PROPERTIES.FILE}" prefix="runtimeProperties."/>
+
+		<!-- Get the DB connection properties for ablapps-->
+		<propertyselector property="ABL.APP.NAMES.DB.CONNECTION.PARAMS" match="runtimeProperties\.(.*)\.DB\.CONNECTION\.PARAMS" select="\1"/>
+		<if>
+			<isset property="ABL.APP.NAMES.DB.CONNECTION.PARAMS"/>
+			<then>
+				<!-- Check if the corresponding ablapp archive exists-->
+				<for list="${ABL.APP.NAMES.DB.CONNECTION.PARAMS}" param="abl.app.name">
+					<sequential>
+						<local name="ABL.APP.ARCHIVE"/>
+						<local name="ABL.APP.ARCHIVE.exists"/>
+						
+						<property name="ABL.APP.ARCHIVE" value="${ABL.APPS.DIR}/@{abl.app.name}.zip" />
+						<available file="${ABL.APP.ARCHIVE}" property="ABL.APP.ARCHIVE.exists" />
+						
+						<fail unless="ABL.APP.ARCHIVE.exists">					
+							Invalid runtime configuration inside ${RUNTIME.PROPERTIES.FILE}: '@{abl.app.name}.DB.CONNECTION.PARAMS=${runtimeProperties.@{abl.app.name}.DB.CONNECTION.PARAMS}'${line.separator}REASON: The ablapp archive is not provided: ${ABL.APP.ARCHIVE}
+						</fail>
+					</sequential>
+				</for>
+			</then>
+		</if>
+	</target>
+
+	<!-- Checks if the deployment artifacts/scripts are present	-->
+	<target name="check.required.props" >
+		<!-- check if PAS.INSTANCE.NAME is provided -->
+		<fail unless="PAS.INSTANCE.NAME"
+			message="Missing PAS.INSTANCE.NAME property. Please provide name of pasoe instance name." />
+		<fail message="Property PAS.INSTANCE.NAME must not be empty">
+		    <condition>
+		        <equals arg1="${PAS.INSTANCE.NAME}" arg2=""/>
+		    </condition>
+		</fail>
+		<!-- check if APP.DOCKER.IMAGE.NAME is provided -->
+		<fail unless="APP.DOCKER.IMAGE.NAME"
+			message="Missing APP.DOCKER.IMAGE.NAME property. Please provide name for the docker image to be built" />
+		<fail message="Property APP.DOCKER.IMAGE.NAME must not be empty">
+		    <condition>
+		        <equals arg1="${APP.DOCKER.IMAGE.NAME}" arg2=""/>
+		    </condition>
+		</fail>
+		<!-- Check if DEPLOYMENT.MODE is valid-->
+		<fail message="Property DEPLOYMENT.MODE is either empty or invalid. Supported modes: docker-compose, docker, minikube">
+		    <condition>
+				<not>
+					<or>
+						<equals arg1="${DEPLOYMENT.MODE}" arg2="docker-compose"/>
+						<equals arg1="${DEPLOYMENT.MODE}" arg2="docker"/>
+						<equals arg1="${DEPLOYMENT.MODE}" arg2="minikube"/>
+					</or>
+				</not>
+		    </condition>
+		</fail>
+		<!-- check if PASOE.DOCKER.IMAGE.NAME is provided -->
+		<fail unless="PASOE.DOCKER.IMAGE.NAME"
+			message="Missing PASOE.DOCKER.IMAGE.NAME property. Please provide name of pasoe docker image to be used" />
+		<fail message="Property PASOE.DOCKER.IMAGE.NAME must not be empty">
+		    <condition>
+		        <equals arg1="${PASOE.DOCKER.IMAGE.NAME}" arg2=""/>
+		    </condition>
+		</fail>
+		<!-- check if JDK.DOCKER.IMAGE.NAME is provided -->
+		<fail unless="JDK.DOCKER.IMAGE.NAME"
+			message="Missing JDK.DOCKER.IMAGE.NAME property. Please provide java image name." />
+		<fail message="Property JDK.DOCKER.IMAGE.NAME must not be empty">
+		    <condition>
+		        <equals arg1="${JDK.DOCKER.IMAGE.NAME}" arg2=""/>
+		    </condition>
+		</fail>
+		<echo message="Validations for required properties are successful" />
+	</target>
+
+	<target name="check.required.files" >
+        <property name="INSTANCE.ARCHIVE.FILE" value="${DIST.DIR}/${INSTANCE.ARCHIVE.FILE.NAME}" />
+		<property name="LICENSE.CFG" value="${ROOT}/license/progress.cfg" />
+		<property name="RUNTIME.PROPERTIES.FILE" value="${ROOT}/conf/runtime.properties" />
+
+		<available file="${INSTANCE.ARCHIVE.FILE}" property="INSTANCE.ARCHIVE.FILE.exists" />
+		<fail message="INSTANCE.ARCHIVE.FILE file missing: ${INSTANCE.ARCHIVE.FILE}" unless="INSTANCE.ARCHIVE.FILE.exists" />
+
+		<available file="${LICENSE.CFG}" property="LICENSE.CFG.exists" />	
+		<fail message="Missing progress.cfg under ${ROOT}/license/" unless="LICENSE.CFG.exists" />
+		
+		<available file="${RUNTIME.PROPERTIES.FILE}" property="RUNTIME.PROPERTIES.FILE.exists" />
+		<fail message="Missing runtime.properties under ${ROOT}/conf/" unless="RUNTIME.PROPERTIES.FILE.exists" />
+
+		<fileset dir="${ROOT}/ablapps" includes="*.zip" id="ablappsdir"/>
+        <pathconvert refid="ablappsdir" property="ablappsdir.contains-files" setonempty="false"/>
+		<fail message="Missing ABL-apps (*.zip) under ${ROOT}/ablapps/" unless="ablappsdir.contains-files" />
+		
+		<!-- Check if the configurations in runtime.properties are correct	-->
+		<antcall target="checkRuntimeProperties">
+			<param name="RUNTIME.PROPERTIES.FILE" value="${RUNTIME.PROPERTIES.FILE}" />
+			<param name="ABL.APPS.DIR" value="${ROOT}/ablapps" />
+		</antcall>
+		<echo message="Validations for required files are successful" />
+	</target>
+
+<!-- Create app image -->
+	<target name="package" depends="createInstanceZip, check.required.props, check.required.files" >
+		<!-- Convert the docker image name to lower case -->
+		<lower string="${APP.DOCKER.IMAGE.NAME}" to="APP.DOCKER.IMAGE.NAME.LOWERCASE" />
+		<echo message="${APP.DOCKER.IMAGE.NAME.LOWERCASE}" />
+		<createDockerImage DOCKER-IMAGE-NAME="${APP.DOCKER.IMAGE.NAME.LOWERCASE}" DOCKER-IMAGE-TAG="${APP.DOCKER.IMAGE.TAG}" DOCKERFILE-LOCATION="${DOCKERFILE.LOCATION}" />
+	</target>
+
+	<target name="load.pasoe.image" description="load docker image of pasoe" if="PASOE.IMAGE.ARCHIVE.FILE.exists">
+		<exec executable="docker" >
+			<arg line="load -i ${PASOE.IMAGE.ARCHIVE.FILE}"/>
+		</exec>
+	</target>
+
+<!-- Call deploy based on deployment mode -->
+	<target name="deploy" depends="load.pasoe.image, deploy_without_load">
+	</target>
+
+<!-- Call deploy based on deployment mode but without loading PASOE image from archive file-->
+	<target name="deploy_without_load" depends="package">
+	    <lower string="${DEPLOYMENT.MODE}" to="DEPLOYMENT.MODE" />
+		<ant antfile="./scripts/${DEPLOYMENT.MODE}/build.xml"  target="deploy" useNativeBasedir="true"/>
+	</target>
+
+<!-- Call undeploy based on deployment mode -->	
+	<target name="undeploy" depends="check.required.props">
+		<ant antfile="./scripts/${DEPLOYMENT.MODE}/build.xml" target="undeploy" useNativeBasedir="true"/>
+	</target>
+
+</project>

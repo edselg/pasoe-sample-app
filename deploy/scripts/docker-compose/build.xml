@@ -1,0 +1,61 @@
+<project name="deployUsingCompose" basedir=".">
+
+	<taskdef resource="net/sf/antcontrib/antlib.xml" classpath="../../lib/ant-contrib-0.6.jar" />
+	
+	<property file="../../config.properties" />
+
+	<propertyregex property="APP.NAME"
+              input="${APP.DOCKER.IMAGE.NAME}"
+              regexp="([^\/]*$)"
+              select="\1"/>
+
+    <property name="APP.DOCKER.IMAGE.FULLNAME" value="${APP.DOCKER.IMAGE.NAME}:${APP.DOCKER.IMAGE.TAG}" />
+	<property name="APP.VOLUME" value="app_dc" />
+	
+	<property name="PASOE.DOCKER.IMAGE.FULLNAME" value="${PASOE.DOCKER.IMAGE.NAME}:${PASOE.DOCKER.IMAGE.TAG}" />
+
+	<property name="JDK.DOCKER.IMAGE.FULLNAME" value="${JDK.DOCKER.IMAGE.NAME}:${JDK.DOCKER.IMAGE.TAG}" />
+	<property name="JDK.VOLUME" value="jdk_dc" />
+	
+	<property name="RUNTIME.CONFIG" location="${basedir}/../../conf/runtime.properties" />
+	<property name="LICENSE.FILE" location="${basedir}/../../license/progress.cfg" />
+	<property name="LOGGING.CONF.DIR" location="${basedir}/../../conf/logging" />
+
+    <target name="generate_tailored_yml">
+		<!-- Copy task that replaces values and copies the files -->
+		<copy todir="${basedir}" verbose="true" overwrite="true" failonerror="true">
+			
+			<!-- List of files to be processed -->
+			<fileset file="${basedir}/*.template.yml" />
+			
+			<!-- Mapper to transform filename. Removes '.template' from the filename when copying the file to output directory -->
+			<mapper type="regexp" from="(.*).template(.*)" to="\1\2" />
+			
+			<!-- Filter chain that replaces the template values with actual values 
+				fetched from properties file -->
+			<filterchain>
+				<expandproperties />
+			</filterchain>
+		</copy>
+	</target>
+    
+    <target name="deploy" depends="generate_tailored_yml, undeploy">
+        <exec executable="docker-compose" failonerror="true" dir="${basedir}">
+			<arg value="-p" />
+			<arg value="${PAS.INSTANCE.NAME}" />
+			<arg value="up" />
+			<arg value="-d" />
+		</exec>
+        <echo message="PASOE instance named '${PAS.INSTANCE.NAME}_dc' will be available at 'https://localhost:${PASOE.HTTPS.PORT}'"/>
+    </target>
+
+    
+    <target name="undeploy" depends="generate_tailored_yml">
+        <exec executable="docker-compose" failonerror="true" dir="${basedir}" >
+			<arg value="-p" />
+			<arg value="${PAS.INSTANCE.NAME}" />
+			<arg value="down" />
+			<arg value="-v" />
+		</exec>
+    </target>
+</project>

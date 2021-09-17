@@ -1,0 +1,86 @@
+<project name="build-tasks" >
+
+
+	<!-- Converts a string to lower case 
+	Example: 	
+		<lower string="HelLo" to="output" />
+		output="hello"	-->
+	<scriptdef language="javascript" name="lower">
+		<attribute name="string" /> 
+		<attribute name="to" />
+		project.setProperty(attributes.get("to"), attributes.get("string").toLowerCase());
+	</scriptdef>
+
+
+	<!-- pushToDockerRegistry task
+    Inputs: 
+    	# DOCKER-REGISTRY-URL
+		# DOCKER-IMAGE-NAME
+		# DOCKER-IMAGE-TAG    -->
+	<macrodef name="pushToDockerRegistry">
+		<attribute name="DOCKER-REGISTRY-URL" />
+		<attribute name="DOCKER-IMAGE-NAME" />
+		<attribute name="DOCKER-IMAGE-TAG" />
+		<sequential>
+			<!-- Check Docker Registry name -->
+			<fail message="DOCKER-REGISTRY-URL has no value">
+				<condition>
+					<equals arg1="@{DOCKER-REGISTRY-URL}" arg2="" />
+				</condition>
+			</fail>
+
+			<property name="DOCKER.IMAGE" value="@{DOCKER-IMAGE-NAME}:@{DOCKER-IMAGE-TAG}" />
+			<property name="DOCKER.IMAGE.URL" value="@{DOCKER-REGISTRY-URL}/${DOCKER.IMAGE}" />
+			
+			<!-- Tag the Image with Registry URL -->
+			<exec executable="docker" failonerror="true" >
+				<arg value="tag" />
+				<arg value="${DOCKER.IMAGE}" />
+				<arg value="${DOCKER.IMAGE.URL}" />
+			</exec>
+			
+			<!-- Push the Image to Docker Registry -->
+			<echo message="Pushing Docker Image: ${DOCKER.IMAGE.URL}" />
+			<exec executable="docker" failonerror="true" >
+				<arg value="push" />
+				<arg value="${DOCKER.IMAGE.URL}" />
+			</exec>
+			
+			<!-- Remove the Tagged image -->
+			<exec executable="docker" failonerror="true" >
+				<arg value="rmi" />
+				<arg value="${DOCKER.IMAGE.URL}" />
+			</exec>
+		</sequential>
+	</macrodef>
+
+
+	<!-- createDockerImage task
+    Inputs: 
+    	# DOCKER-IMAGE-NAME
+    	# DOCKER-IMAGE-TAG
+    	# DOCKERFILE-LOCATION
+    Output:
+    	# a docker image  	-->
+	<macrodef name="createDockerImage">
+		<attribute name="DOCKER-IMAGE-NAME" />
+		<attribute name="DOCKER-IMAGE-TAG" />
+		<attribute name="DOCKERFILE-LOCATION" />
+		<sequential>
+			<available file="@{DOCKERFILE-LOCATION}/Dockerfile" property="DOCKERFILE.exists" />
+			<fail message="DOCKERFILE missing: @{DOCKERFILE-LOCATION}/Dockerfile" unless="DOCKERFILE.exists" />
+
+			<property name="DOCKER.IMAGE" value="@{DOCKER-IMAGE-NAME}:@{DOCKER-IMAGE-TAG}" />
+			
+			<echo message="Creating Docker Image: ${DOCKER.IMAGE}" />
+			<exec executable="docker" failonerror="true" dir="@{DOCKERFILE-LOCATION}">
+				<arg value="build" />
+				<arg value="--no-cache" />
+				<arg value="-t" />
+				<arg value="${DOCKER.IMAGE}" />
+				<arg value="@{DOCKERFILE-LOCATION}" />
+			</exec>
+		</sequential>
+	</macrodef>
+
+</project>

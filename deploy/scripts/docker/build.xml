@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="pasoe_container" default="pasoe_run" basedir=".">
+
+    <taskdef resource="net/sf/antcontrib/antlib.xml" classpath="../../lib/ant-contrib-0.6.jar" />
+
+	<property file="../../config.properties" />
+
+	<propertyregex property="APP.NAME"
+              input="${APP.DOCKER.IMAGE.NAME}"
+              regexp="([^\/]*$)"
+              select="\1"/>
+
+	<property name="APP.DOCKER.IMAGE.FULLNAME" value="${APP.DOCKER.IMAGE.NAME}:${APP.DOCKER.IMAGE.TAG}" />
+	<property name="APP.VOLUME" value="${PAS.INSTANCE.NAME}_app_d" />
+	
+	<property name="PASOE.DOCKER.IMAGE.FULLNAME" value="${PASOE.DOCKER.IMAGE.NAME}:${PASOE.DOCKER.IMAGE.TAG}" />
+
+	<property name="JDK.DOCKER.IMAGE.FULLNAME" value="${JDK.DOCKER.IMAGE.NAME}:${JDK.DOCKER.IMAGE.TAG}" />
+	<property name="JDK.VOLUME" value="${PAS.INSTANCE.NAME}_java_d" />
+	
+	<property name="RUNTIME.CONFIG" location="${basedir}/../../conf/runtime.properties" />
+	<property name="LICENSE.FILE" location="${basedir}/../../license/progress.cfg" />
+	<property name="LOGGING.CONF.DIR" location="${basedir}/../../conf/logging" />
+	
+	<target name="java_home_volume" description="Prepares a named volume '${JDK.VOLUME}' with Oracle JDK in it">
+		<exec executable="docker" failonerror="true" >
+			<arg line="run --rm -v ${JDK.VOLUME}:/${JDK.DOCKER.IMAGE.JAVA.LOCATION} ${JDK.DOCKER.IMAGE.FULLNAME}"/>
+		</exec>
+	</target>
+	
+	<target name="abl_app_volume" description="Prepares a named volume '${APP.VOLUME}' with application image's deploy-staging in it">
+		<exec executable="docker" failonerror="true" >
+			<arg line="run --rm -v ${APP.VOLUME}:/deploy-staging/artifacts ${APP.DOCKER.IMAGE.FULLNAME}"/>
+		</exec>
+	</target>
+	
+	<target name="deploy_app_start_pasoe" depends="java_home_volume,abl_app_volume" description="Deploys abl app from ${APP.VOLUME} volume to pasoe container and starts it">
+		<exec executable="docker" failonerror="true" output=".container_id" >
+			<arg line="run -d --name ${PAS.INSTANCE.NAME}_pasoeinstance_d -v ${APP.VOLUME}:/deploy/artifacts -v ${JDK.VOLUME}:/usr/java -v ${LICENSE.FILE}:/psc/dlc/progress.cfg -v ${LOGGING.CONF.DIR}:/fluentbit-tlr -v ${RUNTIME.CONFIG}:/deploy/scripts/config/runtime.properties -e FLUENTBIT_LOGGING=${FLUENTBIT.LOGGING} -e APP_NAME=${APP.NAME} -e INSTANCE_NAME=${PAS.INSTANCE.NAME} -p ${PASOE.HTTPS.PORT}:8811 ${PASOE.DOCKER.IMAGE.FULLNAME} /bin/sh -c 'sh /deploy/scripts/startServer.sh'"/>
+		</exec>
+		<echo message="PASOE instance named '${PAS.INSTANCE.NAME}_pasoeinstance_d' will be available at 'https://localhost:${PASOE.HTTPS.PORT}'"/>
+	</target>
+	
+	<target name="stop_remove_pasoe_container" description="Stop and remove pasoe container named '${PAS.INSTANCE.NAME}'">
+		
+		<exec executable="docker" outputproperty="container.exist">
+		    <!-- The container name starts with a /
+			 They are planning to fix it , that is the reason ? is added in the regex.
+			 https://github.com/docker/cli/issues/1201 -->
+			<arg line="ps -a --filter name=^\/?${PAS.INSTANCE.NAME}_pasoeinstance_d$ --format '{{.Names}}'"/>
+		</exec>
+
+		<if>
+		   <equals arg1="${container.exist}" arg2="${PAS.INSTANCE.NAME}_pasoeinstance_d"/>
+		   <then>
+		        <exec executable="docker" >
+			        <arg line="container stop ${PAS.INSTANCE.NAME}_pasoeinstance_d"/>
+		        </exec>
+		        <exec executable="docker" >
+			        <arg line="container rm -v ${PAS.INSTANCE.NAME}_pasoeinstance_d"/>
+		        </exec>
+		   </then>
+		 </if>
+		
+	</target>
+	
+	<target name="clean_volumes" description="Delete ${JDK.VOLUME} and ${APP.VOLUME} volumes">
+		<exec executable="docker" outputproperty="app.volume.exist">
+			<arg line="volume ls --filter name=^${APP.VOLUME}$ --format '{{.Name}}'"/>
+		</exec>
+
+		<if>
+		 <equals arg1="${app.volume.exist}" arg2="${APP.VOLUME}"/>
+		 <then>
+		   <exec executable="docker" >
+			   <arg line="volume rm ${APP.VOLUME} "/>
+		   </exec>
+		  </then>
+		</if>
+
+		<exec executable="docker" outputproperty="java.volume.exist">
+			<arg line="volume ls --filter name=^${JDK.VOLUME}$ --format '{{.Name}}'"/>
+		</exec>
+
+		<if>
+		 <equals arg1="${java.volume.exist}" arg2="${JDK.VOLUME}" />
+		 <then>
+		   <exec executable="docker" >
+			   <arg line="volume rm ${JDK.VOLUME}"/>
+		   </exec>
+		 </then>
+		</if>
+	</target>
+	
+	<target name="undeploy" depends="stop_remove_pasoe_container, clean_volumes" >
+	</target>
+
+	<target name="deploy" depends="undeploy, deploy_app_start_pasoe" >
+	</target>
+	
+	<target name="forced_undeploy" >
+		<exec executable="docker" >
+			<arg line="container rm -f -v ${PAS.INSTANCE.NAME}_pasoeinstance_d"/>
+		</exec>
+		<exec executable="docker" >
+			<arg line="volume rm -f ${APP.VOLUME} ${JDK.VOLUME}"/>
+		</exec>
+	</target>
+
+</project>

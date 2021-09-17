@@ -1,0 +1,40 @@
+version: "3.6"
+services:
+    jdk:
+        image: ${JDK.DOCKER.IMAGE.FULLNAME}
+        volumes:
+          - ${JDK.VOLUME}:${JDK.DOCKER.IMAGE.JAVA.LOCATION}
+    ablapp:
+        image: ${APP.DOCKER.IMAGE.FULLNAME}
+        volumes:
+          - ${APP.VOLUME}:/deploy-staging/artifacts
+    pasoeinstance:
+        image: ${PASOE.DOCKER.IMAGE.FULLNAME}
+        depends_on: 
+          - jdk
+          - ablapp
+        environment:
+          - FLUENTBIT_LOGGING=${FLUENTBIT.LOGGING}
+          - APP_NAME=${APP.NAME}
+          - INSTANCE_NAME=${PAS.INSTANCE.NAME}
+        ports:
+          - "${PASOE.HTTPS.PORT}:8811"
+        container_name: "${PAS.INSTANCE.NAME}_pasoeinstance_dc"
+        command: ["/bin/sh", "-c", "sh /deploy/scripts/startServer.sh"]
+        volumes:
+          - type: volume
+            source: ${JDK.VOLUME}
+            target: /usr/java
+            volume:
+              nocopy: true
+          - type: volume
+            source: ${APP.VOLUME}
+            target: /deploy/artifacts
+            volume:
+              nocopy: true
+          - ${LICENSE.FILE}:/psc/dlc/progress.cfg
+          - ${RUNTIME.CONFIG}:/deploy/scripts/config/runtime.properties
+          - ${LOGGING.CONF.DIR}:/fluentbit-tlr
+volumes:
+    ${JDK.VOLUME}:
+    ${APP.VOLUME}:
