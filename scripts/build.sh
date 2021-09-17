@@ -7,3 +7,7 @@
 
 cd ~/pasoe-sample-app/oedb/build/
 ./build.sh
+export DLC=/psc/dlc
+export PATH=$PATH:$DLC/bin
+cd ~/pasoe-sample-app/Sports
+proant package
