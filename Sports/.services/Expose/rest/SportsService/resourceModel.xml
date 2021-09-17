@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<prgs:model xmlns:prgs="http://www.progress.com/caf/camel/component/prgrs" id="resourceModel">
+  <prgs:resource consumes="application/json" name="Customer" path="/Customer" produces="application/json">
+    <prgs:operation consumes="application/json" idls="Sports/.services/AppServer/Customer.pidl::com.progress.openedge.pdt.bpmbindings" name="Customer..UpdateCustomer" path="" produces="application/json" verb="PUT"/>
+    <prgs:operation consumes="application/json" idls="Sports/.services/AppServer/Customer.pidl::com.progress.openedge.pdt.bpmbindings" name="Customer..DeleteCustomer" path="" produces="application/json" verb="DELETE"/>
+    <prgs:operation consumes="application/json" idls="Sports/.services/AppServer/Customer.pidl::com.progress.openedge.pdt.bpmbindings" name="Customer..ReadCustomer" path="" produces="application/json" verb="GET">
+      <prgs:param name="filter" type="QUERY"/>
+    </prgs:operation>
+    <prgs:operation consumes="application/json" idls="Sports/.services/AppServer/Customer.pidl::com.progress.openedge.pdt.bpmbindings" name="Customer..CreateCustomer" path="" produces="application/json" verb="POST"/>
+  </prgs:resource>
+  <prgs:resource name="Customer_count" path="/Customer/count">
+    <prgs:operation consumes="application/json" idls="Sports/.services/AppServer/Customer.pidl::com.progress.openedge.pdt.bpmbindings" name="Customer..count" path="" produces="application/json" verb="PUT">
+      <prgs:param name="filter" type="QUERY"/>
+    </prgs:operation>
+  </prgs:resource>
+  <prgs:resource name="Customer_SubmitCustomer" path="/Customer/SubmitSCustomer">
+    <prgs:operation consumes="application/json" idls="Sports/.services/AppServer/Customer.pidl::com.progress.openedge.pdt.bpmbindings" name="Customer..SubmitCustomer" path="" produces="application/json" verb="PUT"/>
+  </prgs:resource>
+  <prgs:resource consumes="application/json" name="Item" path="/Item" produces="application/json">
+    <prgs:operation consumes="application/json" idls="Sports/.services/AppServer/Item.pidl::com.progress.openedge.pdt.bpmbindings" name="Item..DeleteItem" path="" produces="application/json" verb="DELETE"/>
+    <prgs:operation consumes="application/json" idls="Sports/.services/AppServer/Item.pidl::com.progress.openedge.pdt.bpmbindings" name="Item..UpdateItem" path="" produces="application/json" verb="PUT"/>
+    <prgs:operation consumes="application/json" idls="Sports/.services/AppServer/Item.pidl::com.progress.openedge.pdt.bpmbindings" name="Item..CreateItem" path="" produces="application/json" verb="POST"/>
+    <prgs:operation consumes="application/json" idls="Sports/.services/AppServer/Item.pidl::com.progress.openedge.pdt.bpmbindings" name="Item..ReadItem" path="" produces="application/json" verb="GET">
+      <prgs:param name="filter" type="QUERY"/>
+    </prgs:operation>
+  </prgs:resource>
+  <prgs:resource name="Item_SubmitItem" path="/Item/SubmitItem">
+    <prgs:operation consumes="application/json" idls="Sports/.services/AppServer/Item.pidl::com.progress.openedge.pdt.bpmbindings" name="Item..SubmitItem" path="" produces="application/json" verb="PUT"/>
+  </prgs:resource>
+  <prgs:resource consumes="application/json" name="Order" path="/Order" produces="application/json">
+    <prgs:operation consumes="application/json" idls="Sports/.services/AppServer/Order.pidl::com.progress.openedge.pdt.bpmbindings" name="Order..CreateOrder" path="" produces="application/json" verb="POST"/>
+    <prgs:operation consumes="application/json" idls="Sports/.services/AppServer/Order.pidl::com.progress.openedge.pdt.bpmbindings" name="Order..ReadOrder" path="" produces="application/json" verb="GET">
+      <prgs:param name="filter" type="QUERY"/>
+    </prgs:operation>
+    <prgs:operation consumes="application/json" idls="Sports/.services/AppServer/Order.pidl::com.progress.openedge.pdt.bpmbindings" name="Order..DeleteOrder" path="" produces="application/json" verb="DELETE"/>
+    <prgs:operation consumes="application/json" idls="Sports/.services/AppServer/Order.pidl::com.progress.openedge.pdt.bpmbindings" name="Order..UpdateOrder" path="" produces="application/json" verb="PUT"/>
+  </prgs:resource>
+  <prgs:resource name="Order_SubmitOrder" path="/Order/SubmitOrder">
+    <prgs:operation consumes="application/json" idls="Sports/.services/AppServer/Order.pidl::com.progress.openedge.pdt.bpmbindings" name="Order..SubmitOrder" path="" produces="application/json" verb="PUT"/>
+  </prgs:resource>
+  <prgs:resource consumes="application/json" name="Salesrep" path="/Salesrep" produces="application/json">
+    <prgs:operation consumes="application/json" idls="Sports/.services/AppServer/Salesrep.pidl::com.progress.openedge.pdt.bpmbindings" name="Salesrep..DeleteSalesrep" path="" produces="application/json" verb="DELETE"/>
+    <prgs:operation consumes="application/json" idls="Sports/.services/AppServer/Salesrep.pidl::com.progress.openedge.pdt.bpmbindings" name="Salesrep..UpdateSalesrep" path="" produces="application/json" verb="PUT"/>
+    <prgs:operation consumes="application/json" idls="Sports/.services/AppServer/Salesrep.pidl::com.progress.openedge.pdt.bpmbindings" name="Salesrep..CreateSalesrep" path="" produces="application/json" verb="POST"/>
+    <prgs:operation consumes="application/json" idls="Sports/.services/AppServer/Salesrep.pidl::com.progress.openedge.pdt.bpmbindings" name="Salesrep..ReadSalesrep" path="" produces="application/json" verb="GET">
+      <prgs:param name="filter" type="QUERY"/>
+    </prgs:operation>
+  </prgs:resource>
+  <prgs:resource name="Salesrep_SubmitSalesrep" path="/Salesrep/SubmitSalesrep">
+    <prgs:operation consumes="application/json" idls="Sports/.services/AppServer/Salesrep.pidl::com.progress.openedge.pdt.bpmbindings" name="Salesrep..SubmitSalesrep" path="" produces="application/json" verb="PUT"/>
+  </prgs:resource>
+  <prgs:resource consumes="application/json" name="State" path="/State" produces="application/json">
+    <prgs:operation consumes="application/json" idls="Sports/.services/AppServer/State.pidl::com.progress.openedge.pdt.bpmbindings" name="State..CreateState" path="" produces="application/json" verb="POST"/>
+    <prgs:operation consumes="application/json" idls="Sports/.services/AppServer/State.pidl::com.progress.openedge.pdt.bpmbindings" name="State..ReadState" path="" produces="application/json" verb="GET">
+      <prgs:param name="filter" type="QUERY"/>
+    </prgs:operation>
+    <prgs:operation consumes="application/json" idls="Sports/.services/AppServer/State.pidl::com.progress.openedge.pdt.bpmbindings" name="State..DeleteState" path="" produces="application/json" verb="DELETE"/>
+    <prgs:operation consumes="application/json" idls="Sports/.services/AppServer/State.pidl::com.progress.openedge.pdt.bpmbindings" name="State..UpdateState" path="" produces="application/json" verb="PUT"/>
+  </prgs:resource>
+  <prgs:resource name="State_SubmitState" path="/State/SubmitState">
+    <prgs:operation consumes="application/json" idls="Sports/.services/AppServer/State.pidl::com.progress.openedge.pdt.bpmbindings" name="State..SubmitState" path="" produces="application/json" verb="PUT"/>
+  </prgs:resource>
+</prgs:model>

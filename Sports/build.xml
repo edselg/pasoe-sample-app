@@ -1,0 +1,77 @@
+<project name="ABLapp" default="compile" basedir=".">
+	<property file="build.properties" />
+	<pathconvert property="ROOT" dirsep="/">
+		<path location="${basedir}" />
+	</pathconvert>
+
+	<import file=".scripts/common-build-tasks.xml" />
+
+	<!-- Empty output dir -->
+	<target name="clean" description="Clean output dir">
+		<emptyDir PATH="${OUTPUT.DIR}" />
+	</target>
+
+	<target name="cleanBuildOutput" description="Clean build output dir">
+		<emptyDir PATH="${BUILD.OUTPUT.DIR}" />
+	</target>
+
+	<!-- Compile ABL code-->
+	<target name="compile" description="Compile ABL source files" depends="cleanBuildOutput, appserverCheck">
+
+		<!-- Compile files in Project Root folder -->
+		<compileABLCode BUILD-OUTPUT="${BUILD.OUTPUT.DIR}">
+			<ablfiles>
+				<!-- In order to avoid repetative compilation we are excluing these folders,-->
+				<fileset dir="${ROOT}" includes="**/*.p,**/*.cls">
+					<exclude name="**/src/**" />
+					<exclude name="**/AppServer/**" />
+					<exclude name="**/PASOEContent/**/*" />
+				</fileset>
+				<!-- Compile files in src folder -->
+				<fileset dir="${ROOT}/src" erroronmissingdir="false" includes="**/*.p,**/*.cls">
+					<exclude name="**/AppServer/**" />
+				</fileset>
+				<!-- Compile files in AppServer folder -->
+				<fileset dir="${APSV}" includes="**/*.p,**/*.cls" />
+			</ablfiles>
+		</compileABLCode>
+		<!-- Call webapp build -->
+		<ant antfile="${WEBAPP}/build.xml" target="compile" inheritall="false" />
+	</target>
+
+	<!-- Create the ablapp package -->
+	<target name="package" depends="clean, compile">
+		<!-- Build and package the webapp -->
+		<ant antfile="${WEBAPP}/build.xml" target="package" inheritall="false" />
+		<!-- Package ablapp as zip-->
+		<zip destfile="${DIST.DIR}/${PROJECT.NAME}.zip">
+			<zipfileset dir="tlr" prefix="tlr" />
+			<zipfileset dir="conf" prefix="conf" />
+			<!-- zipfileset file="startup.pf" prefix="conf" /-->
+			<zipfileset dir="${BUILD.OUTPUT.DIR}" prefix="openedge">
+				<include name="**/*.r" />
+				<exclude name="**/.pct" />
+			</zipfileset>
+			<zipfileset dir="${WEBAPP.DIST.DIR}" prefix="webapps" includes="*.war" />
+		</zip>
+	</target>
+
+	<!-- Build single file -->
+	<target name="compileFile" description="Build single ABL source file" depends="setSourceFilePath, setSourceFileParent, setSinglefileOutputDir">
+		<compileABLCode BUILD-OUTPUT="${SINGLE.OUTPUT.DIR}">
+			<ablfiles>
+				<filelist dir="${SOURCE.FILE.PARENT}">
+					<file name="${SOURCE.FILE.PATH}" />
+				</filelist>
+			</ablfiles>
+		</compileABLCode>
+	</target>
+
+	<!-- set single file path -->
+	<target name="setSourceFilePath" description="Set SOURCE.FILE.PATH with the given user path">
+		<!-- SOURCE.FILE.PATH Eg: /projects/singleFileRun/src/AppServer/custom.p -->
+		<pathconvert property="SOURCE.FILE.PATH" dirsep="/">
+			<path location="${compileFilePath}" />
+		</pathconvert>
+	</target>
+</project>

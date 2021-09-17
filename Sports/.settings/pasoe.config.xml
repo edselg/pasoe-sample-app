@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<PASOEConfigDetails version="12.0ALPHA">
+<webapp>Sports</webapp>
+<servers>
+<server>oepas1 in nbhydrahulk10.oepas1 (Progress Application Server for OpenEdge 12.0ALPHA)</server>
+</servers>
+</PASOEConfigDetails>

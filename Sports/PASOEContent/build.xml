@@ -1,0 +1,52 @@
+<project name="buildPASOEContent" default="compile" basedir=".">
+	<property file="build.properties" />
+	<pathconvert property="ROOT" dirsep="/">
+		<path location="${basedir}/../" />
+	</pathconvert>
+
+	<import file="../.scripts/common-build-tasks.xml" />
+
+	<!-- Empty PASOEContent/output dir -->
+	<target name="clean" description="Clean output dir">
+		<emptyDir PATH="${WEBAPP.OUTPUT.DIR}" />
+	</target>
+
+	<target name="cleanBuildOutput" description="Clean build output dir">
+		<emptyDir PATH="${WEBAPP.BUILD.OUTPUT.DIR}" />
+	</target>
+	
+	<!-- Compile ABL code under WEB-INF/openedge -->
+	<target name="compile" depends="cleanBuildOutput">
+		<compileABLCode BUILD-OUTPUT="${WEBAPP.BUILD.OUTPUT.DIR}">
+			<ablfiles>
+				<fileset dir="${WEBINF.SOURCE}">
+					<include name="**/*.cls" />
+					<include name="**/*.p" />
+				</fileset>
+			</ablfiles>
+		</compileABLCode>
+	</target>
+
+	<target name="package" depends="clean, compile">	
+		<mkdir dir="${WEBAPP.DIST.DIR}" />	
+		<!-- Export webapp to a temp war -->
+		<ABLWebAppPackage srcdir="${ROOT}" dlc="${DLC}" verbose="false" isIncremental="false" webAppName="${PROJECT.NAME}_tmp" destdir="${WEBAPP.DIST.DIR}">
+		</ABLWebAppPackage>
+		<!-- Update the war file to include r-code from build-output. Remove build files and output directories -->
+		<zip destfile="${WEBAPP.DIST.DIR}/${PROJECT.NAME}.war">
+			<zipfileset dir="${WEBAPP.BUILD.OUTPUT.DIR}" prefix="WEB-INF/openedge">
+				<include name="**/*.r" />
+				<exclude name="**/.pct" />
+			</zipfileset>
+			<zipfileset src="${WEBAPP.DIST.DIR}/${PROJECT.NAME}_tmp.war">
+				<exclude name="dist/**" />
+				<exclude name="output/**" />
+				<exclude name="build.xml" />
+				<exclude name="build.properties" />
+			</zipfileset>
+		</zip>
+
+		<delete file="${WEBAPP.DIST.DIR}/${PROJECT.NAME}_tmp.war" />
+	</target>
+
+</project>
