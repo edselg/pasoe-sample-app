@@ -38,7 +38,7 @@ cp -f /psc/dlc/progress.cfg ~/pasoe-sample-app/deploy/license
 cd ~/pasoe-sample-app/oedb/build
 ./build.sh
 
-docker run -d -p 20000:20000 -p 3000-3200:3000-3200 -e DB_BROKER_PORT=20000 -e DB_MINPORT=3000 -e DB_MAXPORT=3200 oedb1
+docker run -d -p 20000:20000 -p 3000-3500:3000-3500 -e DB_BROKER_PORT=20000 -e DB_MINPORT=3000 -e DB_MAXPORT=3500 oedb1
 
 cd ~/pasoe-sample-app/Sports
 proant package
