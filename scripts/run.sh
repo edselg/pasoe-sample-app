@@ -6,6 +6,9 @@ export PATH=$DLC/bin:$PATH
 export PUBLIC_IP_ADDRESS=`aws ec2 describe-instances | jq -r '.Reservations[].Instances[] | select(.State.Name == "running" and .Tags[].Value == "dev1") | .PublicIpAddress'`
 export PRIVATE_IP_ADDRESS=`aws ec2 describe-instances | jq -r '.Reservations[].Instances[] | select(.State.Name == "running" and .Tags[].Value == "dev1") | .PrivateIpAddress'`
 
+cp ~/pasoe-sample-app/Sports/conf/startup.pf.bk ~/pasoe-sample-app/Sports/conf/startup.pf
+cp ~/pasoe-sample-app/deploy/conf/runtime.properties.bk ~/pasoe-sample-app/deploy/conf/runtime.properties
+cp ~/pasoe-sample-app/webui/grid.js.bk ~/pasoe-sample-app/webui/grid.js
 sed -i "s/PRIVATE_IP_ADDRESS/${PRIVATE_IP_ADDRESS}/" ~/pasoe-sample-app/Sports/conf/startup.pf
 sed -i "s/PRIVATE_IP_ADDRESS/${PRIVATE_IP_ADDRESS}/" ~/pasoe-sample-app/deploy/conf/runtime.properties
 sed -i "s/PUBLIC_IP_ADDRESS/${PUBLIC_IP_ADDRESS}/" ~/pasoe-sample-app/webui/grid.js
