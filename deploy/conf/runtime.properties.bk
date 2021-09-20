@@ -1,0 +1,3 @@
+# Provide DB configuration for an ablapp, <ABLAPP-NAME> is the name of the archive file placed under 'ablapps' folder
+# <ABLAPP-NAME>.DB.CONNECTION.PARAMS=-db ...
+Sports.DB.CONNECTION.PARAMS=-db sports -H PRIVATE_IP_ADDRESS -S 20000
