@@ -4,7 +4,7 @@
 
 $(function () {
     'use strict';
-    var serviceURI = "https://3.237.14.141:8811/Sports";
+    var serviceURI = "https://PUBLIC_IP_ADDRESS:8811/Sports";
     var catalogURI = serviceURI + "/static/SportsService.json";
 
     function createGrid() {
