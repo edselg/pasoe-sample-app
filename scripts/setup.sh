@@ -11,6 +11,9 @@ sudo chmod +x /usr/local/bin/docker-compose
 export PUBLIC_IP_ADDRESS=`aws ec2 describe-instances | jq -r '.Reservations[].Instances[] | select(.Tags[].Value == "dev1") | .PublicIpAddress'`
 export PRIVATE_IP_ADDRESS=`aws ec2 describe-instances | jq -r '.Reservations[].Instances[] | select(.Tags[].Value == "dev1") | .PrivateIpAddress'`
 
+echo $PUBLIC_IP_ADDRESS
+echo $PRIVATE_IP_ADDRESS
+
 if [ ! -d /usr/lib/jvm/jdk ]
 then
     sudo ln -s /usr/lib/jvm/java-11-amazon-corretto.x86_64 /usr/lib/jvm/jdk
