@@ -47,4 +47,6 @@ cp ~/pasoe-sample-app/Sports/output/package-output/Sports.zip ~/pasoe-sample-app
 cd ~/pasoe-sample-app/deploy
 proant deploy
 
+cd ~/pasoe-sample-app
+docker-compose up -d 
 #
