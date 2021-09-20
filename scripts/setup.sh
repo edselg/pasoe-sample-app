@@ -1,6 +1,8 @@
 #!/bin/sh
 
+export TERM=vt100
 docker login
+sudo yum -y install htop 
 
 if [ ! -d /usr/lib/jvm/jdk ]
 then
