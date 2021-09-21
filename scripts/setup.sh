@@ -1,6 +1,6 @@
 #!/bin/sh
 
-export PROJECT_HOME=~/pasoe-sample-app
+export PROJECT_HOME=~/environment/pasoe-sample-app
 export DLC=/psc/dlc
 export PATH=$DLC/bin:$PATH
 

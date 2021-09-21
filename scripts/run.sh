@@ -1,6 +1,6 @@
 #!/bin/sh
   
-export PROJECT_HOME=~/pasoe-sample-app
+export PROJECT_HOME=~/environment/pasoe-sample-app
 export DLC=/psc/dlc
 export PATH=$DLC/bin:$PATH
 
@@ -10,9 +10,12 @@ export PRIVATE_IP_ADDRESS=`aws ec2 describe-instances | jq -r '.Reservations[].I
 cp $PROJECT_HOME/Sports/conf/startup.pf.bk $PROJECT_HOME/Sports/conf/startup.pf
 cp $PROJECT_HOME/deploy/conf/runtime.properties.bk $PROJECT_HOME/deploy/conf/runtime.properties
 cp $PROJECT_HOME/webui/grid.js.bk $PROJECT_HOME/webui/grid.js
+cp $PROJECT_HOME/web.html.bk $PROJECT_HOME/web.html
 sed -i "s/PRIVATE_IP_ADDRESS/${PRIVATE_IP_ADDRESS}/" $PROJECT_HOME/Sports/conf/startup.pf
 sed -i "s/PRIVATE_IP_ADDRESS/${PRIVATE_IP_ADDRESS}/" $PROJECT_HOME/deploy/conf/runtime.properties
 sed -i "s/PUBLIC_IP_ADDRESS/${PUBLIC_IP_ADDRESS}/" $PROJECT_HOME/webui/grid.js
+sed -i "s/PUBLIC_IP_ADDRESS/${PUBLIC_IP_ADDRESS}/" $PROJECT_HOME/web.html
+exit
 
 docker kill oedb1
 docker rm oedb1
