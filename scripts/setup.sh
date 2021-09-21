@@ -1,5 +1,6 @@
 #!/bin/sh
 
+export PROJECT_HOME=~/pasoe-sample-app
 export DLC=/psc/dlc
 export PATH=$DLC/bin:$PATH
 
@@ -14,9 +15,9 @@ git clone  --recurse-submodules https://github.com/aws-quickstart/quickstart-pro
 export PUBLIC_IP_ADDRESS=`aws ec2 describe-instances | jq -r '.Reservations[].Instances[] | select(.State.Name == "running" and .Tags[].Value == "dev1") | .PublicIpAddress'`
 export PRIVATE_IP_ADDRESS=`aws ec2 describe-instances | jq -r '.Reservations[].Instances[] | select(.State.Name == "running" and .Tags[].Value == "dev1") | .PrivateIpAddress'`
 
-sed -i "s/PRIVATE_IP_ADDRESS/${PRIVATE_IP_ADDRESS}/" ~/pasoe-sample-app/Sports/conf/startup.pf
-sed -i "s/PRIVATE_IP_ADDRESS/${PRIVATE_IP_ADDRESS}/" ~/pasoe-sample-app/deploy/conf/runtime.properties
-sed -i "s/PUBLIC_IP_ADDRESS/${PUBLIC_IP_ADDRESS}/" ~/pasoe-sample-app/webui/grid.js
+sed -i "s/PRIVATE_IP_ADDRESS/${PRIVATE_IP_ADDRESS}/" $PROJECT_HOME/Sports/conf/startup.pf
+sed -i "s/PRIVATE_IP_ADDRESS/${PRIVATE_IP_ADDRESS}/" $PROJECT_HOME/deploy/conf/runtime.properties
+sed -i "s/PUBLIC_IP_ADDRESS/${PUBLIC_IP_ADDRESS}/" $PROJECT_HOME/webui/grid.js
 
 if [ ! -d /usr/lib/jvm/jdk ]
 then
@@ -35,21 +36,21 @@ then
     sudo /home/ec2-user/install/12.3.0/proinst -b /home/ec2-user/install/12.3.0/response_oedev.ini -l /tmp/output.log
 fi
 
-cp -f /psc/dlc/progress.cfg ~/pasoe-sample-app/oedb/build/license
-cp -f /psc/dlc/progress.cfg ~/pasoe-sample-app/deploy/license
+cp -f /psc/dlc/progress.cfg $PROJECT_HOME/oedb/build/license
+cp -f /psc/dlc/progress.cfg $PROJECT_HOME/deploy/license
 
-cd ~/pasoe-sample-app/oedb/build
+cd $PROJECT_HOME/oedb/build
 ./build.sh
 
 docker run -d -p 20000:20000 -p 3000-3500:3000-3500 -e DB_BROKER_PORT=20000 -e DB_MINPORT=3000 -e DB_MAXPORT=3500 oedb1
 
-cd ~/pasoe-sample-app/Sports
+cd $PROJECT_HOME/Sports
 proant package
-cp ~/pasoe-sample-app/Sports/output/package-output/Sports.zip ~/pasoe-sample-app/deploy/ablapps/
+cp $PROJECT_HOME/Sports/output/package-output/Sports.zip $PROJECT_HOME/deploy/ablapps/
 
-cd ~/pasoe-sample-app/deploy
+cd $PROJECT_HOME/deploy
 proant deploy
 
-cd ~/pasoe-sample-app
+cd $PROJECT_HOME
 docker-compose up -d 
 #

@@ -1,15 +1,16 @@
 #!/bin/sh
 
+export PROJECT_HOME=~/pasoe-sample-app
 export DLC=/psc/dlc
 export PATH=$DLC/bin:$PATH
 
 export PRIVATE_IP_ADDRESS=`aws ec2 describe-instances | jq -r '.Reservations[].Instances[] | select(.State.Name == "running" and .Tags[].Value == "dev1") | .PrivateIpAddress'`
 
-sed -i "s/PRIVATE_IP_ADDRESS/${PRIVATE_IP_ADDRESS}/" ~/pasoe-sample-app/Sports/conf/startup.pf
+sed -i "s/PRIVATE_IP_ADDRESS/${PRIVATE_IP_ADDRESS}/" $PROJECT_HOME/Sports/conf/startup.pf
 
-#cd ~/pasoe-sample-app/oedb/build
+#cd $PROJECT_HOME/oedb/build
 #./build.sh
 
-cd ~/pasoe-sample-app/Sports
+cd $PROJECT_HOME/Sports
 proant package
-cp ~/pasoe-sample-app/Sports/output/package-output/Sports.zip ~/pasoe-sample-app/deploy/ablapps/
+cp $PROJECT_HOME/Sports/output/package-output/Sports.zip $PROJECT_HOME/deploy/ablapps/
