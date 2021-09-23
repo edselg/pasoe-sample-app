@@ -1,1 +1,4 @@
-oedb/build/license/progress.cfg
+license/
+build-output/
+package-output/
+deploy/ablapps/
