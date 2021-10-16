@@ -169,7 +169,7 @@
 	</target>
 
 <!-- Call deploy based on deployment mode but without loading PASOE image from archive file-->
-	<target name="deploy_without_load" depends="package">
+	<target name="deploy_without_load">
 	    <lower string="${DEPLOYMENT.MODE}" to="DEPLOYMENT.MODE" />
 		<ant antfile="./scripts/${DEPLOYMENT.MODE}/build.xml"  target="deploy" useNativeBasedir="true"/>
 	</target>
