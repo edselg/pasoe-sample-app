@@ -39,17 +39,17 @@ then
 fi
 
 mkdir -p ~/install
-if [ ! -f /home/ec2-user/install/12.3.0.tar.gz ]
-then
-    echo `date +%H:%M:%S`: Downloading OpenEdge 12.3.0
-    aws s3 cp s3://mysupportfiles2/12.3.0.tar.gz ~/install
-    tar xzvCf ~/install ~/install/12.3.0.tar.gz
-fi
-
 if [ ! -d /psc ]
 then
+    if [ ! -f /home/ec2-user/install/12.3.0.tar.gz ]
+    then
+        echo `date +%H:%M:%S`: Downloading OpenEdge 12.3.0
+        aws s3 cp s3://mysupportfiles2/12.3.0.tar.gz ~/install
+        tar xzvCf ~/install ~/install/12.3.0.tar.gz
+        rm ~/install/12.3.0.tar.gz    
+    fi
     echo `date +%H:%M:%S`: Installing OpenEdge 12.3.0
-    sudo /home/ec2-user/install/12.3.0/proinst -b /home/ec2-user/install/12.3.0/response_oedev.ini -l /tmp/output.log
+    sudo /home/ec2-user/install/12.3.0/proinst -b /home/ec2-user/install/12.3.0/response_oedev.ini -l /tmp/output.log && rm -rf ~/install/12.3.0
 fi
 
 cp -f /psc/dlc/progress.cfg $PROJECT_HOME/oedb/build/license
