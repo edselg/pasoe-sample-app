@@ -76,7 +76,7 @@ then
     for c in /home/ec2-user/install/containers/*.tar
     do
         echo Loading $c
-        docker load -i 
+        docker load -i $c
         rm $c
     done
 fi    
