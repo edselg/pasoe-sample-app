@@ -39,18 +39,48 @@ then
 fi
 
 mkdir -p ~/install
+# if [ ! -d /psc ]
+# then
+#     if [ ! -f /home/ec2-user/install/12.3.0.tar.gz ]
+#     then
+#         echo `date +%H:%M:%S`: Downloading OpenEdge 12.3.0
+#         aws s3 cp s3://mysupportfiles2/12.3.0.tar.gz ~/install
+#         tar xzvCf ~/install ~/install/12.3.0.tar.gz
+#         rm ~/install/12.3.0.tar.gz    
+#     fi
+#     echo `date +%H:%M:%S`: Installing OpenEdge 12.3.0
+#     sudo /home/ec2-user/install/12.3.0/proinst -b /home/ec2-user/install/12.3.0/response_oedev.ini -l /tmp/output.log && rm -rf ~/install/12.3.0
+# fi
 if [ ! -d /psc ]
 then
-    if [ ! -f /home/ec2-user/install/12.3.0.tar.gz ]
+    if [ ! -f /home/ec2-user/install/dlc_12.3.0.tar.gz ]
     then
         echo `date +%H:%M:%S`: Downloading OpenEdge 12.3.0
-        aws s3 cp s3://mysupportfiles2/12.3.0.tar.gz ~/install
-        tar xzvCf ~/install ~/install/12.3.0.tar.gz
-        rm ~/install/12.3.0.tar.gz    
+        aws s3 cp s3://mysupportfiles2/dlc_12.3.0.tar.gz ~/install
     fi
     echo `date +%H:%M:%S`: Installing OpenEdge 12.3.0
-    sudo /home/ec2-user/install/12.3.0/proinst -b /home/ec2-user/install/12.3.0/response_oedev.ini -l /tmp/output.log && rm -rf ~/install/12.3.0
+    sudo tar xzvCf / /home/ec2-user/install/dlc_12.3.0.tar.gz > /dev/null 2>&1    
+    rm ~/install/dlc_12.3.0.tar.gz
 fi
+
+if [ ! -d /home/ec2-user/install/containers ]
+then
+    if [ ! -f /home/ec2-user/install/containers.tar ]
+    then
+        echo `date +%H:%M:%S`: Downloading Container Bundle
+        aws s3 cp s3://mysupportfiles2/containers.tar ~/install
+    fi
+    echo `date +%H:%M:%S`: Extracting Containers    
+    tar xvCf ~/install ~/install/containers.tar
+    echo `date +%H:%M:%S`: Loading Containers
+    for c in /home/ec2-user/install/containers/*.tar
+    do
+        echo Loading $c
+        docker load -i 
+        rm $c
+    done
+fi    
+exit
 
 cp -f /psc/dlc/progress.cfg $PROJECT_HOME/oedb/build/license
 cp -f /psc/dlc/progress.cfg $PROJECT_HOME/deploy/license
@@ -67,10 +97,14 @@ then
     cat $ERROR_FILE
 fi
 
-echo `date +%H:%M:%S`: Building PASOE Sample App
+echo `date +%H:%M:%S`: Compiling PASOE Sample App
 cd $PROJECT_HOME/Sports
 proant package
 cp $PROJECT_HOME/Sports/output/package-output/Sports.zip $PROJECT_HOME/deploy/ablapps/
+
+echo `date +%H:%M:%S`: Building PASOE Sample App
+cd $PROJECT_HOME/deploy
+proant package
 
 echo `date +%H:%M:%S`: Deploying PASOE Sample App
 cd $PROJECT_HOME/deploy
