@@ -80,7 +80,6 @@ then
         rm $c
     done
 fi    
-exit
 
 cp -f /psc/dlc/progress.cfg $PROJECT_HOME/oedb/build/license
 cp -f /psc/dlc/progress.cfg $PROJECT_HOME/deploy/license
