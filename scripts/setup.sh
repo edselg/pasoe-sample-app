@@ -24,6 +24,12 @@ fi
 cd
 # git clone  --recurse-submodules https://github.com/aws-quickstart/quickstart-progress-openedge.git
 
+mkdir -p ~/environment/.c9/builders
+cp $PROJECT_HOME/scripts/ABL.build -p ~/environment/.c9/builders
+
+mkdir -p ~/environment/.c9/runners
+cp $PROJECT_HOME/scripts/ABL.run -p ~/environment/.c9/runners
+
 export PUBLIC_IP_ADDRESS=`aws ec2 describe-instances | jq -r '.Reservations[].Instances[] | select(.State.Name == "running" and .Tags[].Value == "dev1") | .PublicIpAddress'`
 export PRIVATE_IP_ADDRESS=`aws ec2 describe-instances | jq -r '.Reservations[].Instances[] | select(.State.Name == "running" and .Tags[].Value == "dev1") | .PrivateIpAddress'`
 

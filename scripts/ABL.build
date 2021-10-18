@@ -1,0 +1,8 @@
+// Create a custom Cloud9 build system - similar to the Sublime build system
+// For more information see http://docs.aws.amazon.com/console/cloud9/create-builder-runner
+{
+    "cmd" : ["/home/ec2-user/environment/pasoe-sample-app/scripts/build.sh", "$file", "$args"],
+    "env" : {},
+    "info" : "Building $project_path/$file_name",
+    "selector": "source.cls"
+}
