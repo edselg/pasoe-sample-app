@@ -52,15 +52,15 @@ CLASS Customer INHERITS BusinessEntity:
             THIS-OBJECT:JFPFillMethod (INPUT filter).
         ELSE 
         DO:
-            BUFFER ttCustomer:HANDLE:BATCH-SIZE = 0.
-            BUFFER ttCustomer:SET-CALLBACK ("AFTER-ROW-FILL", "AddIdField").
-            SUPER:ReadData(filter).
+            // BUFFER ttCustomer:HANDLE:BATCH-SIZE = 0.
+            // BUFFER ttCustomer:SET-CALLBACK ("AFTER-ROW-FILL", "AddIdField").
+            // SUPER:ReadData(filter).
             // TEST
-            // EMPTY TEMP-TABLE ttCustomer.
-            // FOR EACH Customer WHERE Customer.CustNum < 3200 NO-LOCK:
-            //     CREATE ttCustomer.
-            //     BUFFER-COPY Customer TO ttCustomer.
-            // END.            
+            EMPTY TEMP-TABLE ttCustomer.
+            FOR EACH Customer WHERE Customer.CustNum < 3200 NO-LOCK:
+                CREATE ttCustomer.
+                BUFFER-COPY Customer TO ttCustomer.
+            END.            
         END.
     END METHOD.
 
