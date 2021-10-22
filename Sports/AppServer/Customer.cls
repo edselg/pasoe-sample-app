@@ -55,7 +55,7 @@ CLASS Customer INHERITS BusinessEntity:
             // BUFFER ttCustomer:HANDLE:BATCH-SIZE = 0.
             // BUFFER ttCustomer:SET-CALLBACK ("AFTER-ROW-FILL", "AddIdField").
             // SUPER:ReadData(filter).
-            // TEST
+            // TEST CHECK-IN
             EMPTY TEMP-TABLE ttCustomer.
             FOR EACH Customer WHERE Customer.CustNum < 3200 NO-LOCK:
                 CREATE ttCustomer.
