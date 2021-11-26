@@ -8,6 +8,18 @@ export PATH=$DLC/bin:$PATH
 export DOCKER_BUILDKIT=1
 export ERROR_FILE=/tmp/errors.$$
 
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.34.0/install.sh | bash
+. ~/.nvm/nvm.sh
+nvm install node
+sudo yum -y install gcc
+sudo amazon-linux-extras -y install docker
+curl -L https://raw.githubusercontent.com/c9/install/master/install.sh | bash
+
+sudo systemctl enable docker
+sudo systemctl start docker
+sudo usermod -aG docker ec2-user
+
+exit
 docker login
 if [ ! -f /usr/bin/htop -o ! -f /usr/bin/jq ]
 then
