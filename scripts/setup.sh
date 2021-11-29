@@ -9,21 +9,14 @@ export DOCKER_BUILDKIT=1
 export ERROR_FILE=/tmp/errors.$$
 
 docker login
-
-cd
-# git clone  --recurse-submodules https://github.com/aws-quickstart/quickstart-progress-openedge.git
-
 mkdir -p ~/environment/.c9/builders
 cp $PROJECT_HOME/scripts/ABL.build -p ~/environment/.c9/builders
-
 mkdir -p ~/environment/.c9/runners
 cp $PROJECT_HOME/scripts/ABL.run -p ~/environment/.c9/runners
 
 export MAC_ADDRESS=`curl -s http://169.254.169.254/latest/meta-data/mac`
 export PUBLIC_IP_ADDRESS=`curl -s http://169.254.169.254/latest/meta-data/network/interfaces/macs/${MAC_ADDRESS}/public-ipv4s`
 export PRIVATE_IP_ADDRESS=`curl -s http://169.254.169.254/latest/meta-data/local-ipv4`
-
-echo "DEBUG: ${MAC_ADDRESS} ${PUBLIC_IP_ADDRESS} ${PRIVATE_IP_ADDRESS}"
 
 echo `date +%H:%M:%S`: Tailoring Project Files
 cp $PROJECT_HOME/Sports/conf/startup.pf.src $PROJECT_HOME/Sports/conf/startup.pf
@@ -36,15 +29,8 @@ sed -i "s/PRIVATE_IP_ADDRESS/${PRIVATE_IP_ADDRESS}/" $PROJECT_HOME/deploy/conf/r
 sed -i "s/PUBLIC_IP_ADDRESS/${PUBLIC_IP_ADDRESS}/" $PROJECT_HOME/webui/grid.js
 sed -i "s/PUBLIC_IP_ADDRESS/${PUBLIC_IP_ADDRESS}/" $PROJECT_HOME/web.html
 
-if [ ! -d /usr/lib/jvm/jdk ]
-then
-    sudo ln -s /usr/lib/jvm/java-11-amazon-corretto.x86_64 /usr/lib/jvm/jdk
-fi
-
 cp -f /psc/dlc/progress.cfg $PROJECT_HOME/oedb/build/license
 cp -f /psc/dlc/progress.cfg $PROJECT_HOME/deploy/license
-
-exit
 
 echo `date +%H:%M:%S`: Building OEDB1 container
 cd $PROJECT_HOME/oedb/build
@@ -62,6 +48,8 @@ echo `date +%H:%M:%S`: Compiling PASOE Sample App
 cd $PROJECT_HOME/Sports
 proant package
 cp $PROJECT_HOME/Sports/output/package-output/Sports.zip $PROJECT_HOME/deploy/ablapps/
+
+exit
 
 echo `date +%H:%M:%S`: Building PASOE Sample App
 cd $PROJECT_HOME/deploy
