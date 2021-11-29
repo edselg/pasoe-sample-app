@@ -1,6 +1,5 @@
 #!/bin/sh
 
-echo `date +%H:%M:%S`: Setup Begin
 export TERM=vt100
 export PROJECT_HOME=~/environment/pasoe-sample-app
 export DLC=/psc/dlc
@@ -8,7 +7,7 @@ export PATH=$DLC/bin:$PATH
 export DOCKER_BUILDKIT=1
 export ERROR_FILE=/tmp/errors.$$
 
-docker login
+echo `date +%H:%M:%S`: Setup Begin
 mkdir -p ~/environment/.c9/builders
 cp $PROJECT_HOME/scripts/ABL.build -p ~/environment/.c9/builders
 mkdir -p ~/environment/.c9/runners
@@ -48,8 +47,6 @@ echo `date +%H:%M:%S`: Compiling PASOE Sample App
 cd $PROJECT_HOME/Sports
 proant package
 cp $PROJECT_HOME/Sports/output/package-output/Sports.zip $PROJECT_HOME/deploy/ablapps/
-
-exit
 
 echo `date +%H:%M:%S`: Building PASOE Sample App
 cd $PROJECT_HOME/deploy
