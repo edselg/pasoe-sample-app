@@ -28,8 +28,8 @@ sed -i "s/PRIVATE_IP_ADDRESS/${PRIVATE_IP_ADDRESS}/" $PROJECT_HOME/deploy/conf/r
 sed -i "s/PUBLIC_IP_ADDRESS/${PUBLIC_IP_ADDRESS}/" $PROJECT_HOME/webui/grid.js
 sed -i "s/PUBLIC_IP_ADDRESS/${PUBLIC_IP_ADDRESS}/" $PROJECT_HOME/web.html
 
-cp -f /psc/dlc/progress.cfg $PROJECT_HOME/oedb/build/license
-cp -f /psc/dlc/progress.cfg $PROJECT_HOME/deploy/license
+cp -f ~/environment/progress.cfg $PROJECT_HOME/oedb/build/license
+cp -f ~/environment/progress.cfg $PROJECT_HOME/deploy/license
 
 echo `date +%H:%M:%S`: Building OEDB1 container
 cd $PROJECT_HOME/oedb/build
