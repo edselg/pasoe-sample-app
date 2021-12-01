@@ -29,6 +29,7 @@ sed -i "s/PRIVATE_IP_ADDRESS/${PRIVATE_IP_ADDRESS}/" $PROJECT_HOME/deploy/conf/r
 sed -i "s/PUBLIC_IP_ADDRESS/${PUBLIC_IP_ADDRESS}/" $PROJECT_HOME/webui/grid.js
 sed -i "s/PUBLIC_IP_ADDRESS/${PUBLIC_IP_ADDRESS}/" $PROJECT_HOME/web.html
 
+sudo cp -f ~/environment/progress.cfg /psc/dlc/
 cp -f ~/environment/progress.cfg $PROJECT_HOME/oedb/build/license
 cp -f ~/environment/progress.cfg $PROJECT_HOME/deploy/license
 
