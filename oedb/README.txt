@@ -42,4 +42,4 @@ Features
 
 Features
 --------
-* Base Images for 12.3.0 Progress OpenEdge RDBMS (Enterprise RDBMS and Advanced Enterprise RDBMS)
+* Base Images for 12.5.0 Progress OpenEdge RDBMS (Enterprise RDBMS and Advanced Enterprise RDBMS)

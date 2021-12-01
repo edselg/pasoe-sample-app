@@ -1,6 +1,6 @@
 # Arguments used for images
 ARG DB_DOCKER_IMAGE_NAME=store/progresssoftware/oedb
-ARG DB_DOCKER_IMAGE_TAG=12.3.0_ent
+ARG DB_DOCKER_IMAGE_TAG=12.5.0_ent
 
 ARG JDK_DOCKER_IMAGE_NAME
 ARG JDK_DOCKER_IMAGE_TAG

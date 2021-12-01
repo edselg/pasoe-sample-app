@@ -22,9 +22,9 @@ if [ ! -z ${SAMPLE_DB_NAME} ]; then
 fi
 
 # Load the database image.
-DB_IMAGE_FILE="${SCRIPTPATH}/../PROGRESS_OE_DATABASE_CONTAINER_IMAGE_12.3.0_LNX_64.tar.gz"
-if [ "x${DB_DOCKER_IMAGE_TAG}" == "x12.3.0_adv-ent" ]; then
-  DB_IMAGE_FILE="${SCRIPTPATH}/../PROGRESS_OE_ADVANCED_DATABASE_CONTAINER_IMAGE_12.3.0_LNX_64.tar.gz"
+DB_IMAGE_FILE="${SCRIPTPATH}/../PROGRESS_OE_DATABASE_CONTAINER_IMAGE_12.5.0_LNX_64.tar.gz"
+if [ "x${DB_DOCKER_IMAGE_TAG}" == "x12.5.0_adv-ent" ]; then
+  DB_IMAGE_FILE="${SCRIPTPATH}/../PROGRESS_OE_ADVANCED_DATABASE_CONTAINER_IMAGE_12.5.0_LNX_64.tar.gz"
 fi
 if [[ -f ${DB_IMAGE_FILE} ]]; then
   echo "Loading the openedge database image ..."
