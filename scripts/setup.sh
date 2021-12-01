@@ -12,6 +12,7 @@ mkdir -p ~/environment/.c9/builders
 cp $PROJECT_HOME/scripts/ABL.build -p ~/environment/.c9/builders
 mkdir -p ~/environment/.c9/runners
 cp $PROJECT_HOME/scripts/ABL.run -p ~/environment/.c9/runners
+cp $PROJECT_HOME/scripts/ABL-PROC.run -p ~/environment/.c9/runners
 
 export MAC_ADDRESS=`curl -s http://169.254.169.254/latest/meta-data/mac`
 export PUBLIC_IP_ADDRESS=`curl -s http://169.254.169.254/latest/meta-data/network/interfaces/macs/${MAC_ADDRESS}/public-ipv4s`
