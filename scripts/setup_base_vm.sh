@@ -56,16 +56,17 @@ fi
 
 if [ ! -d /psc ]
 then
-    if [ ! -f /home/ec2-user/install/12.3.0.tar.gz ]
+    if [ ! -f /home/ec2-user/install/PROGRESS_OE_12.5_LNX_64.tar.gz ]
     then
-        echo `date +%H:%M:%S`: Downloading OpenEdge 12.3.0
-        mkdir -p ~/install        
-        aws s3 cp s3://mysupportfiles2/12.3.0.tar.gz ~/install
-        tar xzvCf ~/install ~/install/12.3.0.tar.gz
-        rm ~/install/12.3.0.tar.gz    
+        echo `date +%H:%M:%S`: Downloading OpenEdge 12.5.0
+        mkdir -p ~/install/12.5.0/
+        aws s3 cp s3://mysupportfiles2/PROGRESS_OE_12.5_LNX_64.tar.gz ~/install
+        aws s3 cp s3://mysupportfiles2/response_12.5.0.ini ~/install/12.5.0        
+        tar xzvCf ~/install/12.5.0/ ~/install/PROGRESS_OE_12.5_LNX_64.tar.gz
+        rm ~/install/PROGRESS_OE_12.5_LNX_64.tar.gz
     fi
-    echo `date +%H:%M:%S`: Installing OpenEdge 12.3.0
-    sudo /home/ec2-user/install/12.3.0/proinst -b /home/ec2-user/install/12.3.0/response_oedev.ini -l /tmp/output.log && rm -rf ~/install/12.3.0
+    echo `date +%H:%M:%S`: Installing OpenEdge 12.5.0
+    sudo /home/ec2-user/install/12.5.0/proinst -b /home/ec2-user/install/12.5.0/response_12.5.0.ini -l /tmp/output.log && rm -rf ~/install/12.5.0
 fi
 
 echo `date +%H:%M:%S`: Setup Complete
